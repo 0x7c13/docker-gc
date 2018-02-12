@@ -43,3 +43,18 @@ When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when 
     -STATSD_PORT 8125
 
 Note: When DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES set to -1, docker-gc will perform one-time cleanup (Exited after finished)
+
+
+### Helm Chart
+Helm chart for docker-gc is also included, for custom configuration changes, please head to values.yaml.
+
+An example of helm config:
+
+    strategy: ByDate
+    executionIntervalInMinutes: 60
+    dockerEndpoint: unix:///var/run/docker.sock
+    daysBeforeDeletion: 30
+    containerStateBlacklist: dead,exited
+    waitForContainersInBlacklistStateForDays: 7
+    
+Note: When executionIntervalInMinutes set to -1, docker-gc will perform one-time cleanup.
