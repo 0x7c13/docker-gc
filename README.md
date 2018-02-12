@@ -38,8 +38,8 @@ When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when 
     -DOCKERGC_RECYCLING_STRATEGY ByDiskSpace
     -DOCKERGC_SIZE_LIMIT_IN_GIGABYTE 100                         // remove images/layers when total disk space used
                                                                  // by all images is greater then 100 GB
-    -STATSD_LOGGER_ENABLED false                                
-    -STATSD_HOST Statsd
+    -STATSD_LOGGER_ENABLED False                                
+    -STATSD_HOST localhost
     -STATSD_PORT 8125
 
 Note: When DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES set to -1, docker-gc will perform one-time cleanup (Exited after finished)
