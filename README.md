@@ -1,4 +1,4 @@
-# DockerGC
+# docker-gc
 
 ## Introduction
 docker-gc is a microservice to cleanup docker images automatically based on recycling strategy. Dockerfile and helm charts are provided for easy installation.
@@ -11,7 +11,7 @@ docker-gc runs every 60 minutes (configurable) to analysis host docker registry 
 
 ## Installation
 
-Run docker-gc container standalone:
+Run docker-gc container standalone using default configs:
 ```
 $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock jackil/docker-gc
 ```
@@ -20,10 +20,10 @@ $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock jackil/docker-gc
 DockerGC will cleanup images older than pre-configured interval if no running containers were found or no containers were found in pre-configed blacklist states. Images used by containers in blacklist states will be removed, containers in blacklist states will also be stopped and removed as well.
     
 #### 1. ByDate
-    When recycling strategy set to [ByDate], DockerGC will cleanup images older than pre-configured interval.
+When recycling strategy set to [ByDate], DockerGC will cleanup images older than pre-configured interval.
     
 #### 2. ByDiskSpace
-    When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when disk usage of all docker images is over threshold.
+When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when disk usage of all docker images is over threshold.
 
 
 ### Example of Configurations [Environment variables]
@@ -44,4 +44,4 @@ DockerGC will cleanup images older than pre-configured interval if no running co
     -STATSD_HOST Statsd
     -STATSD_PORT 8125
 
-Note: When DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES set to -1, docker-gc will only perform one-time cleanup.
+Note: When DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES set to -1, docker-gc will perform one-time cleanup (Exited after finished)
