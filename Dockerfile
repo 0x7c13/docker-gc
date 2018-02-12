@@ -19,7 +19,7 @@ ENV DOCKERGC_CONTAINER_STATE_BLACKLIST dead,exited
 
 # DockerGC will wait for containers in blacklist state for given amount of time
 # before taking action when this valvue is set to be greater then zero
-ENV DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_IN_DAYS 7
+ENV DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS 7
 
 # Whitelist of images
 # Example: ENV DOCKERGC_IMAGE_WHITELIST docker-gc:latest,microsoft*,ubuntu*,*logger*
