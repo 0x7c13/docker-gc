@@ -21,7 +21,7 @@ DockerGC will cleanup images older than pre-configured interval if no running co
 When recycling strategy set to [ByDate], DockerGC will cleanup images older than pre-configured interval.
     
 #### 2. ByDiskSpace
-When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when disk usage of all docker images is over threshold.
+When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when disk usage of all docker images is over threshold. It will delete oldest images first.
 
 
 ### Example of Configurations [Environment variables]
@@ -33,12 +33,12 @@ When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when 
     -DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_IN_DAYS 7   // container dead or exited within 7 days
                                                                  // you can also add more states based on your need
     -DOCKERGC_RECYCLING_STRATEGY ByDate
-    -DOCKERGC_DAYS_BEFORE_DELETION 30
+    -DOCKERGC_DAYS_BEFORE_DELETION 30                            // remove images/layers older then 30 if possible
      OR
     -DOCKERGC_RECYCLING_STRATEGY ByDiskSpace
-    -DOCKERGC_SIZE_LIMIT_IN_GIGABYTE 100
-
-    -STATSD_LOGGER_ENABLED false                                 // statsd logger
+    -DOCKERGC_SIZE_LIMIT_IN_GIGABYTE 100                         // remove images/layers when total disk space used
+                                                                 // by all images is greater then 100 GB
+    -STATSD_LOGGER_ENABLED false                                
     -STATSD_HOST Statsd
     -STATSD_PORT 8125
 
