@@ -47,8 +47,8 @@
             var containerStateBlacklist = new Matchlist(Environment.GetEnvironmentVariable("DOCKERGC_CONTAINER_STATE_BLACKLIST"));
             var imageWhitelist = new Matchlist(Environment.GetEnvironmentVariable("DOCKERGC_IMAGE_WHITELIST"));
             
-            ValidateEnvironmentVariable("DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_IN_DAYS");
-            var waitToleranceOfBlacklistStateContainersInDays = int.Parse(Environment.GetEnvironmentVariable("DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_IN_DAYS")?.ToString());
+            ValidateEnvironmentVariable("DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS");
+            var waitToleranceOfBlacklistStateContainersInDays = int.Parse(Environment.GetEnvironmentVariable("DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS")?.ToString());
 
             if (string.Equals(recyclingStrategytype, ByDateRecyclingStrategy.Name, StringComparison.InvariantCultureIgnoreCase))
             {

@@ -18,7 +18,7 @@ config:
   #strategy: ByDiskSpace
   #sizeLimitInGigabyte:
   containerStateBlacklist: dead,exited
-  waitForContainersInBlacklistStateInDays: 7
+  waitForContainersInBlacklistStateForDays: 7
 resources:
   limits:
     cpu: 100m
