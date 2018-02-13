@@ -11,6 +11,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../DockerGC/DockerGC.csproj" />
+    <ProjectReference Include="..\DockerGC\DockerGC.csproj" />
   </ItemGroup>
 </Project>
