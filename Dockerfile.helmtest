@@ -18,7 +18,7 @@ RUN /bin/helm init --client-only && /bin/helm repo update
 
 WORKDIR ["/bin/helm"]
 
-COPY docker-gc docker-gc
+COPY helm-chart/docker-gc docker-gc
 
 RUN MSG=$(helm lint docker-gc | grep "no failures")
 
