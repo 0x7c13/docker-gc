@@ -1,9 +1,15 @@
+sudo: required
 language: csharp
 mono: none
 dotnet: 2.0.0
- 
-services:
-  - docker
+dist: trusty
 
-before_install:
-  - docker build .
+install:
+#- docker build -t jackil/docker-gc-test -f Dockerfile.test .
+- docker build -t jackil/docker-gc-helm-chart-validate -f ./helm-chart/Dockerfile .
+
+script:
+- docker build -t jackil/docker-gc -f Dockerfile .
+
+after_success:
+- docker build -t jackil/docker-gc -f Dockerfile .
