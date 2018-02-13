@@ -98,7 +98,7 @@ namespace DockerGC
                     {
                         if (_executionIntervalInMinutes > 0) 
                         {
-                            Console.Error.WriteLine($"No matching images were found. DockerGC will re-evaluate in {_executionIntervalInMinutes} minutes");
+                            Console.Error.WriteLine($"[{DateTime.UtcNow.ToString()} UTC] No matching images were found. DockerGC will re-evaluate in {_executionIntervalInMinutes} minutes");
                         }
                     }
                 }
