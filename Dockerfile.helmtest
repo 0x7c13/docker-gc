@@ -25,5 +25,4 @@ RUN MSG=$(helm lint docker-gc | grep "no failures")
 RUN echo $MSG
 
 RUN if [ "$MSG" != "" ];\
-
     then exit1; fi;
