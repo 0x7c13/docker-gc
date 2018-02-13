@@ -6,7 +6,7 @@ dist: trusty
 
 install:
 - docker build -t docker-gc-test -f Dockerfile.test .
-#- docker build -t docker-gc-helm-chart-validate -f ./helm-chart/Dockerfile .
+- docker build -t docker-gc-helm-chart-validate -f Dockerfile.helmtest .
 
 script:
 - docker build -t jackil/docker-gc -f Dockerfile .
