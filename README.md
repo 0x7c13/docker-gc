@@ -1,4 +1,5 @@
-# docker-gc [![Build Status](https://travis-ci.org/JasonStein/docker-gc.svg?branch=master)](https://travis-ci.org/JasonStein/docker-gc)
+# docker-gc 
+[![Build Status](https://travis-ci.org/JasonStein/docker-gc.svg?branch=master)](https://travis-ci.org/JasonStein/docker-gc)
 
 docker-gc is a microservice to cleanup docker images automatically based on recycling strategy. Dockerfile and helm charts are provided for easy installation.
 
