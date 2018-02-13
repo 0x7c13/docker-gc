@@ -35,7 +35,7 @@ When recycling strategy set to [ByDiskSpace], DockerGC will cleanup images when 
     -DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS 7  // container dead or exited within 7 days
                                                                  // you can also add more states based on your need
     -DOCKERGC_RECYCLING_STRATEGY ByDate
-    -DOCKERGC_DAYS_BEFORE_DELETION 30                            // remove images/layers older then 30 if possible
+    -DOCKERGC_DAYS_BEFORE_DELETION 14                            // remove images/layers older then 14d if possible
      OR
     -DOCKERGC_RECYCLING_STRATEGY ByDiskSpace
     -DOCKERGC_SIZE_LIMIT_IN_GIGABYTE 100                         // remove images/layers when total disk space used
