@@ -1,7 +1,7 @@
 # docker-gc 
 [![Build Status](https://travis-ci.org/JasonStein/docker-gc.svg?branch=master)](https://travis-ci.org/JasonStein/docker-gc)
 
-docker-gc is a microservice to cleanup docker images automatically based on recycling strategy. Dockerfile and helm charts are provided for easy installation.
+docker-gc is a gc service for docker that helps you delete docker images smartly based on recycling strategy. Dockerfile and helm charts are provided for easy installation.
 
 ## Why do I need docker-gc?
 When you have a host machine running docker containers, whenever your docker container uses host docker (by exposing docker socket), it leaves marks and you will need to cleanup images produced by those containers eventually. Things will get worse especially when you have numbers of docker build agents running in a cluster that use heavily on host docker. In this scenario, a GC service is needed, not only to cleanup unused images but also to keep as much base images/layers as possible for caching purposes. If this makes sense to you, you will simply need it. However, this also works on your dev-box if your disk space is limited and you are producing/using tons of docker images frequently.
