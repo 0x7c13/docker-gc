@@ -1,8 +1,5 @@
 sudo: required
 language: csharp
-mono: none
-dotnet: 2.0.0
-dist: trusty
 
 install:
 - docker build -t docker-gc-test -f Dockerfile.test .
