@@ -1,3 +1,4 @@
+
 # docker-gc 
 [![Build Status](https://travis-ci.org/JasonStein/docker-gc.svg?branch=master)](https://travis-ci.org/JasonStein/docker-gc)
 
@@ -14,6 +15,14 @@ docker-gc runs every 60 minutes (configurable) to analysis host docker registry 
 Run docker-gc container standalone using default configs:
 ```
 $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock jackil/docker-gc
+```
+Run docker-gc container with your own configs:
+```
+docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
+	       -e DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES='120' \
+	       -e DOCKERGC_RECYCLING_STRATEGY='ByDate' \
+	       -e DOCKERGC_DAYS_BEFORE_DELETION='30' \
+	       jackil/docker-gc
 ```
 
 ## Recycling Strategy
