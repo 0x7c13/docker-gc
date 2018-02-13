@@ -1,6 +1,6 @@
 sudo: required
 language: csharp
-mono:none
+mono: none
 
 install:
 - docker build -t docker-gc-test -f Dockerfile.test .
