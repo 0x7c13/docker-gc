@@ -1,0 +1,12 @@
+# DockerGC Unit Tests Dockerfile
+
+FROM microsoft/dotnet:2.0-sdk
+
+COPY DockerGC DockerGC
+COPY DockerGC.Tests DockerGC.Tests
+WORKDIR /DockerGC.Tests
+
+RUN ["dotnet", "restore"]
+RUN ["dotnet", "test"]
+
+ENTRYPOINT ["dotnet", "run"]
