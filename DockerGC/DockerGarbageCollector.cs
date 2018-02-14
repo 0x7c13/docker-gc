@@ -67,7 +67,8 @@ namespace DockerGC
                     Console.Error.WriteLine(e);
                 }               
             }
-
+            
+            Console.Error.WriteLine($"[{DateTime.UtcNow.ToString()} UTC] {deletedImages} images deleted (total of {(int)(recycledDiskSize / (1024 * 1024))} MB). DockerGC will re-evaluate in {_executionIntervalInMinutes} minutes");
             _logger.LogCounter("images-recycled-count", deletedImages);
             _logger.LogCounter("disk-space-recycled-mb", (int)(recycledDiskSize / (1024 * 1024)));
         }
