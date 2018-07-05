@@ -21,10 +21,10 @@
                      "STATSD_LOGGER_ENABLED": "false",
                      "DOCKERGC_RECYCLING_STRATEGY": "ByDate", // or ByDiskSpace
                      "DOCKERGC_DOCKER_ENDPOINT": "unix:///var/run/docker.sock",
-                     "DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS": "3",
+                     "DOCKERGC_IMAGE_DELETION_ORDER": "ByImageLastTouchDate",
                      "DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES": "-1",
                      "DOCKERGC_DAYS_BEFORE_DELETION": "14",
-                     "DOCKERGC_SIZE_LIMIT_IN_GIGABYTE": "2",
+                     //"DOCKERGC_SIZE_LIMIT_IN_GIGABYTE": "20",
                      "DOCKERGC_IMAGE_WHITELIST": "",
                      "DOCKERGC_CONTAINER_STATE_BLACKLIST": "dead,exited"
              }
