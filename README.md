@@ -97,7 +97,7 @@ Note: When executionIntervalInMinutes set to -1, docker-gc will perform one-time
 | `config.dockerEndpoint`               | docker daemon endpoint                      | unix:///var/run/docker.sock             |
 | `config.executionIntervalInMinutes`   | grace period in minutes before gc occurs    | 60                                      |
 | `config.dockerClientTimeoutInSeconds` | docker client timeout                       | 180                                     |
-| `config.imageDeletionOrder`           | gc delete order                             | ByImageLastTouchDate                    |
+| `config.imageDeletionOrder`           | image deletion order                        | ByImageLastTouchDate                    |
 | `config.strategy`                     | image deletion strategy                     | ByDate                                  |
 | `config.daysBeforeDeletion`           | date setting for ByDate strategy            | 30                                      |
 | `config.sizeLimitInGigabyte`          | threshold setting for ByDiskSpace strategy  | Not set                                 |
