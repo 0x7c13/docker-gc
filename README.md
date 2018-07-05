@@ -83,14 +83,28 @@ Why do I need docker-gc for Kubernetes???
 
 Examples:
 ```
-helm install --set config.strategy=ByDiskSpace --set config.sizeLimitInGigabyte=15 --set config.executionIntervalInMinutes=720 jackil-docker-gc
+helm install --set config.strategy=ByDiskSpace --set config.sizeLimitInGigabyte=15 --set config.executionIntervalInMinutes=720 --set config.imageDeletionOrder=ByImageLastTouchDate jackil-docker-gc
 ```
 or
 ```
-helm install --set config.strategy=ByDate --set config.daysBeforeDeletion=30 --set config.executionIntervalInMinutes=720 jackil-docker-gc
+helm install --set config.strategy=ByDate --set config.daysBeforeDeletion=30 --set config.executionIntervalInMinutes=720 --set config.imageDeletionOrder=ByImageLastTouchDate jackil-docker-gc
 ```
 
 Note: When executionIntervalInMinutes set to -1, docker-gc will perform one-time cleanup.
+
+| Parameter                             | Description                                 | Default                                 |
+| ------------------------------------- | ------------------------------------------- | --------------------------------------- |
+| `config.dockerEndpoint`               | docker daemon endpoint                      | unix:///var/run/docker.sock             |
+| `config.executionIntervalInMinutes`   | grace period in minutes before gc occurs    | 60                                      |
+| `config.dockerClientTimeoutInSeconds` | docker client timeout                       | 180                                     |
+| `config.imageDeletionOrder`           | gc delete order                             | ByImageLastTouchDate                    |
+| `config.strategy`                     | image deletion strategy                     | ByDate                                  |
+| `config.daysBeforeDeletion`           | date setting for ByDate strategy            | 30                                      |
+| `config.sizeLimitInGigabyte`          | threshold setting for ByDiskSpace strategy  | Not set                                 |
+| `config.containerStateBlacklist`      | state list for gc to safely stop and remove | dead,exited                             |
+| `statsd.enabled`                      | enable statsd counter log                   | false                                   |
+| `statsd.host`                         | statsd host (localhost)                     | Not set                                 |
+| `statsd.port`                         | statsd port (8125)                          | Not set                                 |
 
 For custom configurations, please head to values.yaml.
 
