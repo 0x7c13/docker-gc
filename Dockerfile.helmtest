@@ -5,7 +5,7 @@ FROM alpine:3.6
 
 RUN apk add --update --no-cache ca-certificates
 
-ENV VERSION v2.5.0
+ENV VERSION v2.9.1
 ENV FILENAME helm-${VERSION}-linux-amd64.tar.gz
 
 ADD http://storage.googleapis.com/kubernetes-helm/${FILENAME} /tmp
@@ -18,7 +18,7 @@ RUN /bin/helm init --client-only && /bin/helm repo update
 
 WORKDIR ["/bin/helm"]
 
-COPY helm-chart/docker-gc docker-gc
+COPY helm-chart/jackil-docker-gc docker-gc
 
 RUN MSG=$(helm lint docker-gc | grep "no failures")
 
