@@ -1,12 +1,10 @@
-apiVersion: v1
+name: jackil-docker-gc
 description: A Docker Image Garbage Collector Helm chart for Kubernetes
-name: docker-gc
+home: https://github.com/JasonStein/docker-gc
 version: 1.0.0
-keywords:
-- docker
-- garbage collector
-- image recycling
-- gc
+appVersion: latest
+sources:
+  - https://github.com/JasonStein/docker-gc
 maintainers:
-- name: Jackie Liu
-  email: jackil@Microsoft.com
+  - name: Jiaqi Liu
+    email: jackil@Microsoft.com
