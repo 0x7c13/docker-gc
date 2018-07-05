@@ -1,0 +1,19 @@
+[Unit]
+Description=docker-gc
+
+[Service]
+TimeoutStartSec=1200
+ExecStartPre=/opt/bin/docker-wrapper pull %n
+
+# This service accesses docker on the host, so we map the socket into it.
+# We are setting the docker-gc to:
+# 1. Execute every 12 hours
+# 2. Keep disk usage of docker images below 80% of (total diskspace - 100Gb) // 100Gb is reserved for system files and log files
+# 3. Delete least used images first by comparing image last touch date
+ExecStart=/bin/bash -c "/opt/bin/docker-wrapper run --rm --memory=128M -v /var/run/docker.sock:/var/run/docker.sock -e DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES='720' -e DOCKERGC_RECYCLING_STRATEGY='ByDiskSpace' -e DOCKERGC_IMAGE_DELETION_ORDER='ByImageLastTouchDate' -e DOCKERGC_SIZE_LIMIT_IN_GIGABYTE=$$(freeDisk=$(df --output=size /var/lib/docker | awk 'FNR == 2 {print int(($1/1024/1024-100)*0.8)}'); if [[ $freeDisk -gt 0 ]]; then echo $freeDisk; else echo 0; fi) -e DOCKERGC_STATSD_LOGGER_ENABLED='True' %n"
+ExecStop=/opt/bin/docker-wrapper stop %n
+RestartSec=5s
+Restart=on-failure
+
+[X-Fleet]
+Global=true

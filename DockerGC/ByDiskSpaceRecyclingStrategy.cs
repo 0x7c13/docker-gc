@@ -8,11 +8,13 @@ namespace DockerGC
 
     public class ByDiskSpaceRecyclingStrategy : RecyclingStrategy
     {   
-        public static string Name = "ByDiskSpace";
-
         public double SizeLimitInGigabyte;
 
-        public ByDiskSpaceRecyclingStrategy(double sizeLimitInGigabyte, IMatchlist imageWhitelist, IMatchlist stateBlacklist, int waitToleranceOfBlacklistStateContainersInDays) : base(imageWhitelist, stateBlacklist, waitToleranceOfBlacklistStateContainersInDays)
+        public ImageDeletionOrderType ImageDeletionOrder;
+
+        private IDictionary<string, DateTime> _imageLastTouchDate;
+
+        public ByDiskSpaceRecyclingStrategy(double sizeLimitInGigabyte, IMatchlist imageWhitelist, IMatchlist stateBlacklist, IDictionary<string, DateTime> imageLastTouchDate, ImageDeletionOrderType deletionOrder) : base(imageWhitelist, stateBlacklist)
         {
             if (sizeLimitInGigabyte < 0) 
             {
@@ -20,6 +22,8 @@ namespace DockerGC
             } 
 
             this.SizeLimitInGigabyte = sizeLimitInGigabyte;
+            this.ImageDeletionOrder = deletionOrder;
+            this._imageLastTouchDate = imageLastTouchDate;
         }
 
         private IList<DockerImageNode> _getLeafImageNodes(DockerImageNode imageNode) 
@@ -67,7 +71,17 @@ namespace DockerGC
 
         private IList<DockerImageNode> _getImagesToBeRecycledInOrder(IList<DockerImageNode> leafNodes, long totalDiskUsage)
         {
-            var leafs = leafNodes.OrderBy(o => o.InspectResponse.Created).ToList();
+            IList<DockerImageNode> leafs = null;
+
+            if (ImageDeletionOrder is ImageDeletionOrderType.ByImageCreationDate)
+            {
+                leafs = leafNodes.OrderBy(o => o.InspectResponse.Created).ToList();
+            }
+            else if (ImageDeletionOrder is ImageDeletionOrderType.ByImageLastTouchDate)
+            {
+                leafs = leafNodes.OrderBy(o => o.GetImageLastTouchDate(this._imageLastTouchDate)).ToList();
+            }
+
             var imagesCanNotBeDeleted = new List<DockerImageNode>();
             var imagesToBeRecycledInOrder = new List<DockerImageNode>();
             var analyzedImages = new List<DockerImageNode>();
@@ -108,21 +122,38 @@ namespace DockerGC
 
                 if (!allChildImagesHaveBeenAnalyzed) continue;
 
-                var index = 0;
-                for (int i = 0; i < leafs.Count; i++) 
+                // Put new leaf node (current node's parent) in the queue by creation date or last touch date order
+                _insertNodeIntoLeafsQueue(leafs, node.Parent);
+            }
+            return imagesToBeRecycledInOrder;
+        }
+
+        private void _insertNodeIntoLeafsQueue(IList<DockerImageNode> leafs, DockerImageNode node)
+        {
+            var index = leafs.Count;
+            for (int i = 0; i < leafs.Count; i++) 
+            {
+                if (ImageDeletionOrder is ImageDeletionOrderType.ByImageCreationDate)
                 {
-                    if (node.Parent.InspectResponse.Created < leafs[i].InspectResponse.Created) 
+                    if (node.InspectResponse.Created < leafs[i].InspectResponse.Created) 
                     {
                         index = i;
                         break;
                     }
                 }
-                leafs.Insert(index, node.Parent);
+                else if (ImageDeletionOrder is ImageDeletionOrderType.ByImageLastTouchDate)
+                {
+                    if (node.GetImageLastTouchDate(this._imageLastTouchDate) < leafs[i].GetImageLastTouchDate(this._imageLastTouchDate)) 
+                    {
+                        index = i;
+                        break;
+                    }
+                }
             }
-            return imagesToBeRecycledInOrder;
+            leafs.Insert(index, node);
         }
 
-        public override IList<DockerImageNode> GetImagesToBeRecycledInOrder(IList<DockerImageNode> baseImageNodes) 
+        public override IList<DockerImageNode> GetImagesToBeRecycledInOrder(IList<DockerImageNode> baseImageNodes)
         {
             var totalDiskUsage = 0L;
             var imagesToBeRecycledInOrder = new List<DockerImageNode>();

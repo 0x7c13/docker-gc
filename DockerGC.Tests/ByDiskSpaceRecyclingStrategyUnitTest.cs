@@ -31,7 +31,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldNotRemoveAnyImage_WhenNoImagesWereFound()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), 0);
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate);
 
             var imagesToBeRecycled = strategy.GetImagesToBeRecycledInOrder(new List<DockerImageNode>());
 
@@ -44,7 +44,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldNotRemoveAnyImage_WhenSpaceIsEnough()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(1, new Matchlist(), new Matchlist("dead,exited"), 0); // 1GB
+            var strategy = new ByDiskSpaceRecyclingStrategy(1, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate); // 1GB
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -74,9 +74,9 @@ namespace DockerGC.Tests
         // Image: B () 3 days 200MB (0/0)
         // Image: C () 5 days 300MB (0/0)
         [Fact]
-        public void ShouldRemoveOldImages_WhenNoContainersWereFound()
+        public void ShouldRemoveOldImages_WhenNoContainersWereFound_ByImageCreationDate()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0.2, new Matchlist(), new Matchlist("dead,exited"), 0); // 200MB
+            var strategy = new ByDiskSpaceRecyclingStrategy(0.2, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate); // 200MB
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -111,13 +111,131 @@ namespace DockerGC.Tests
         }
 
         // Image: ID (Tag) Created (Running/Containers)
+        // Image: A () 5 days - 3 days (Touch) 100MB (0/0)
+        // Image: B () 10 days - 2 days (touch) 200MB (0/0)
+        // Image: C () 15 days - Never used (touch) 300MB (0/0)
+        // Should delete A first (3 days old), B second (2 days old) and C Next (never used yet)
+        [Fact]
+        public void ShouldRemoveImagesInLastTouchDateOrder_WhenDeletionOrderSetToByImageLastTouchDate()
+        {
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageLastTouchDate); // 200MB
+
+            var images = new List<DockerImageNode>() {
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "A",
+                        Created = DateTime.UtcNow.AddDays(-5), // 5 day
+                        Size = 100 * 1024 * 1024 // 100 MB
+                    },
+                    Containers = new List<ContainerInspectResponse>() {
+                        new ContainerInspectResponse(){
+                            State = new ContainerState() {
+                                Status = "dead",
+                                FinishedAt = DateTime.UtcNow.AddDays(-3).ToString(), // 3 days
+                            },
+                        }
+                    },
+                },
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "B",
+                        Created = DateTime.UtcNow.AddDays(-10), // 10 days
+                        Size = 200 * 1024 * 1024 // 200 MB
+                    },
+                    Containers = new List<ContainerInspectResponse>() {
+                        new ContainerInspectResponse(){
+                            State = new ContainerState() {
+                                Status = "dead",
+                                FinishedAt = DateTime.UtcNow.AddDays(-2).ToString(), // 2 days
+                            },
+                        }
+                    },
+                },
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "C",
+                        Created = DateTime.UtcNow.AddDays(-15), // 15 days
+                        Size = 300 * 1024 * 1024 // 300 MB
+                    },     
+                },            
+            };
+
+            _fixParentRef(images);
+            var imagesToBeRecycled = strategy.GetImagesToBeRecycledInOrder(images);
+
+            Assert.True(imagesToBeRecycled.Count == 3);
+            Assert.True(string.Equals(imagesToBeRecycled[0].InspectResponse.ID, "A"));
+            Assert.True(string.Equals(imagesToBeRecycled[1].InspectResponse.ID, "B"));
+            Assert.True(string.Equals(imagesToBeRecycled[2].InspectResponse.ID, "C"));
+        }
+
+        // Image: ID (Tag) Created (Running/Containers)
+        // Image: A () 5 days - 3 days (Touch) 100MB (0/0)
+        // Image: B () 10 days - 2 days (touch) 200MB (0/0)
+        // Image: C () 15 days - Never used (touch) 300MB (0/0)
+        // Should delete A first (3 days old), B second (2 days old) and C Next (never used yet)
+        [Fact]
+        public void ShouldRemoveImagesInLastTouchDateOrder_WhenDeletionOrderSetToByImageLastTouchDate_UsingRecords()
+        {
+            var eventRecord =  new Dictionary<string, DateTime>()
+                                {
+                                    { "A" , DateTime.UtcNow.AddDays(-3) },
+                                    { "B" , DateTime.UtcNow.AddDays(-2) },
+                                };
+
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), eventRecord, ImageDeletionOrderType.ByImageLastTouchDate); // 200MB
+
+            var images = new List<DockerImageNode>() {
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "A",
+                        Created = DateTime.UtcNow.AddDays(-5), // 5 day
+                        Size = 100 * 1024 * 1024 // 100 MB
+                    },
+                },
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "B",
+                        Created = DateTime.UtcNow.AddDays(-10), // 10 days
+                        Size = 200 * 1024 * 1024 // 200 MB
+                    },
+                },
+                new DockerImageNode() {
+                    InspectResponse = new ImageInspectResponse() {
+                        ID = "C",
+                        Created = DateTime.UtcNow.AddDays(-15), // 15 days
+                        Size = 300 * 1024 * 1024 // 300 MB
+                    },     
+                },            
+            };
+
+            _fixParentRef(images);
+            var imagesToBeRecycled = strategy.GetImagesToBeRecycledInOrder(images);
+
+            Assert.True(imagesToBeRecycled.Count == 3);
+            Assert.True(string.Equals(imagesToBeRecycled[0].InspectResponse.ID, "A"));
+            Assert.True(string.Equals(imagesToBeRecycled[1].InspectResponse.ID, "B"));
+            Assert.True(string.Equals(imagesToBeRecycled[2].InspectResponse.ID, "C"));
+
+            eventRecord["C"] = DateTime.UtcNow.AddDays(-5);
+
+            imagesToBeRecycled = strategy.GetImagesToBeRecycledInOrder(images);
+
+            Assert.True(imagesToBeRecycled.Count == 3);
+            Assert.True(string.Equals(imagesToBeRecycled[0].InspectResponse.ID, "C"));
+            Assert.True(string.Equals(imagesToBeRecycled[1].InspectResponse.ID, "A"));
+            Assert.True(string.Equals(imagesToBeRecycled[2].InspectResponse.ID, "B"));
+
+        }
+
+        // Image: ID (Tag) Created (Running/Containers)
         // Image: A () 1 days 100MB (0/1)
         // Image: B () 3 days 200MB (0/1)
         // Image: C () 5 days 300MB (0/2)
         [Fact]
         public void ShouldRemoveOldImages_WhenContainersWereFoundButNotInRunningOrRestartingState()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0.2, new Matchlist(), new Matchlist("dead,exited"), 0); // 200MB
+            var strategy = new ByDiskSpaceRecyclingStrategy(0.2, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate); // 200MB
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -187,7 +305,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldNotRemoveAnyImage_WhenAllImagesHaveRunningOrRestartingContainer()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), 0);
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate);
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -245,7 +363,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldNotRemoveImage_WhenChildImagesHaveRunningOrRestartingContainer()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), 0);
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate);
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -338,7 +456,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldRemoveOldImages_InDependencyOrder_HaveNoRunningOrRestartingContainers_All()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), 0);
+            var strategy = new ByDiskSpaceRecyclingStrategy(0, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate);
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {
@@ -457,7 +575,7 @@ namespace DockerGC.Tests
         [Fact]
         public void ShouldRemoveOldImages_InDependencyOrder_HaveNoRunningOrRestartingContainers_Partial()
         {
-            var strategy = new ByDiskSpaceRecyclingStrategy(0.5, new Matchlist(), new Matchlist("dead,exited"), 0); // 500MB
+            var strategy = new ByDiskSpaceRecyclingStrategy(0.5, new Matchlist(), new Matchlist("dead,exited"), new Dictionary<string, DateTime>(), ImageDeletionOrderType.ByImageCreationDate); // 500MB
 
             var images = new List<DockerImageNode>() {
                 new DockerImageNode() {

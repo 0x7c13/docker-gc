@@ -37,6 +37,11 @@ namespace DockerGC
             Children = new List<DockerImageNode>();
         }
 
+        public static string GetImageShortId(string longId)
+        {
+            return longId.Substring("sha256:".Length, 12);
+        }
+
         public int GetContainerCount() 
         {
             return Containers.Count;
@@ -64,17 +69,59 @@ namespace DockerGC
             return count;
         }
 
-        public DateTime GetMostRecentFinshedAtTimestampOfAllContainers(IMatchlist states) 
+        public DateTime GetMostRecentTouchDateOfAllContainers()
         {
-            DateTime timestamp = DateTime.MinValue;
+            DateTime lastTouchDate = DateTime.MinValue;
 
-            foreach (var container in Containers.Where(c => states.Match(c.State.Status))) 
+            foreach (var container in Containers) 
             {
-                var time = DateTime.Parse(container.State.FinishedAt);
-                if (time > timestamp) timestamp = time;
+                lastTouchDate = container.Created;
+
+                if (!string.IsNullOrEmpty(container.State?.FinishedAt))
+                {
+                    var time = DateTime.Parse(container.State.FinishedAt);
+                    if (time > lastTouchDate) lastTouchDate = time;
+                }
+
+                if (!string.IsNullOrEmpty(container.State?.StartedAt))
+                {
+                    var time = DateTime.Parse(container.State.StartedAt);
+                    if (time > lastTouchDate) lastTouchDate = time;
+                }
             }
 
-            return timestamp;
+            return lastTouchDate;
+        }
+
+        public DateTime GetImageLastTouchDate(IDictionary<string, DateTime> imageLastTouchDate) 
+        {
+            DateTime lastTouchDate = DateTime.MinValue;
+            DateTime time;
+
+            if (imageLastTouchDate.TryGetValue(this.InspectResponse.ID, out time))
+            {
+                lastTouchDate = time;
+            }
+            else if (GetContainerCount() > 0) // Query existing containers for most recent touch time
+            {
+                lastTouchDate = GetMostRecentTouchDateOfAllContainers();
+                imageLastTouchDate[this.InspectResponse.ID] = lastTouchDate;
+            }
+            else if (this.Children.Count() > 0) // Query child images to get most recent touch date
+            {
+                foreach (var child in this.Children)
+                {
+                    var childLastTouchDate = child.GetImageLastTouchDate(imageLastTouchDate);
+                    if (childLastTouchDate > lastTouchDate) lastTouchDate = childLastTouchDate;
+                }
+            } 
+            else // No record found, no child containers, no containers using this image
+            {
+                lastTouchDate = DateTime.UtcNow;
+                imageLastTouchDate[this.InspectResponse.ID] = lastTouchDate;
+            }
+
+            return lastTouchDate;
         }
     }
 }
