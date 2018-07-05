@@ -1,10 +1,16 @@
 docker-gc is running (Configured to run every {{ .Values.config.executionIntervalInMinutes }} minutes)
 
 {{- if eq .Values.config.strategy "ByDate" }}
-docker-gc will check every {{ .Values.config.executionIntervalInMinutes }} minutes and remove images older than {{ .Values.config.daysBeforeDeletion }} days in current configuration.
+docker-gc is set to check every {{ .Values.config.executionIntervalInMinutes }} minutes and remove images older than {{ .Values.config.daysBeforeDeletion }} days in current configuration.
 {{- else if eq .Values.config.strategy "ByDiskSpace" }}
-docker-gc will check every {{ .Values.config.executionIntervalInMinutes }} minutes and remove images based on disk usage of all docker images.
-Current threshold size limit is: {{ .Values.config.sizeLimitInGigabyte }} GB
+docker-gc is set to check every {{ .Values.config.executionIntervalInMinutes }} minutes and remove images based on disk usage of all docker images.
+Current threshold image usage limit is: {{ .Values.config.sizeLimitInGigabyte }} GB
 {{- end }}
 
-docker-gc will stop and remove containers in {{ .Values.config.containerStateBlacklist }} states if last finished at date is greater then {{ .Values.config.waitForContainersInBlacklistStateForDays }} days.
+{{- if eq .Values.config.imageDeletionOrder "ByImageCreationDate" }}
+docker-gc is set to delete image in the order of image creation date.
+{{- else if eq .Values.config.imageDeletionOrder "ByImageLastTouchDate" }}
+docker-gc is set to delete image in the order of image last touch date.
+{{- end }}
+
+docker-gc is set to stop and remove containers running with old images in these states: {{ .Values.config.containerStateBlacklist }}
