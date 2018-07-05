@@ -7,18 +7,22 @@ namespace DockerGC
     using Docker.DotNet.Models;
 
     public class ByDateRecyclingStrategy : RecyclingStrategy
-    {   
-        public static string Name = "ByDate";
-
+    {
         public int DaysBeforeDeletion;
 
-        public ByDateRecyclingStrategy(int daysBeforeDeletion, IMatchlist imageWhitelist, IMatchlist stateBlacklist, int waitToleranceOfBlacklistStateContainersInDays) : base(imageWhitelist, stateBlacklist, waitToleranceOfBlacklistStateContainersInDays)
+        public ImageDeletionOrderType ImageDeletionOrder;
+
+        private IDictionary<string, DateTime> _imageLastTouchDate;
+
+        public ByDateRecyclingStrategy(int daysBeforeDeletion, IMatchlist imageWhitelist, IMatchlist stateBlacklist,  IDictionary<string, DateTime> imageLastTouchDate, ImageDeletionOrderType deletionOrder) : base(imageWhitelist, stateBlacklist)
         {
             if (daysBeforeDeletion < 0) 
             {
                 throw new ArgumentOutOfRangeException("daysBeforeDeletion");
             } 
             this.DaysBeforeDeletion = daysBeforeDeletion;
+            this.ImageDeletionOrder = deletionOrder;
+            this._imageLastTouchDate = imageLastTouchDate;
         }
 
         // Returns true when all child images can be deleted, meaning all child images have no running containers (all dead or exited)
@@ -33,9 +37,21 @@ namespace DockerGC
                 else imagesToBeRecycledInOrder.Add(child);
             }
 
-            if (image.InspectResponse.Created >= DateTime.UtcNow.AddDays(-this.DaysBeforeDeletion))
+            if (ImageDeletionOrder is ImageDeletionOrderType.ByImageCreationDate)
             {
-                canDelete = false;
+                if (image.InspectResponse.Created >= DateTime.UtcNow.AddDays(-this.DaysBeforeDeletion))
+                {
+                    return false;
+                }
+            }
+            else if (ImageDeletionOrder is ImageDeletionOrderType.ByImageLastTouchDate)
+            {
+                var imageLastTouchDate = image.GetImageLastTouchDate(this._imageLastTouchDate);
+
+                if (imageLastTouchDate >= DateTime.UtcNow.AddDays(-this.DaysBeforeDeletion))
+                {
+                    return false;
+                }
             }
 
             if (!base.CanDelete(image)) canDelete = false;
@@ -43,7 +59,7 @@ namespace DockerGC
             return canDelete;
         }
 
-        public override IList<DockerImageNode> GetImagesToBeRecycledInOrder(IList<DockerImageNode> baseImageNodes) 
+        public override IList<DockerImageNode> GetImagesToBeRecycledInOrder(IList<DockerImageNode> baseImageNodes)
         {
             var imagesToBeRecycledInOrder = new List<DockerImageNode>();
 

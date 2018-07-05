@@ -6,7 +6,7 @@ namespace DockerGC
     {
         public void LogCounter(string key, int value)
         {
-            Console.WriteLine($"{key}: {value}");
+            Console.WriteLine($"[{DateTime.UtcNow.ToString()} UTC] {key}: {value}");
         }
     }
 }

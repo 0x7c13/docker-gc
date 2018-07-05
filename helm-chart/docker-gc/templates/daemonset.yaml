@@ -24,8 +24,10 @@ spec:
           value: {{ .Values.config.dockerEndpoint | quote }}
         - name: DOCKERGC_CONTAINER_STATE_BLACKLIST
           value: {{ .Values.config.containerStateBlacklist | quote }}
-        - name: DOCKERGC_WAIT_FOR_CONTAINERS_IN_BLACKLIST_STATE_FOR_DAYS
-          value: {{ .Values.config.waitForContainersInBlacklistStateForDays | quote }}
+        - name: DOCKERGC_IMAGE_DELETION_ORDER
+          value: {{ .Values.config.imageDeletionOrder | quote }}
+        - name: DOCKERGC_DOCKER_CLIENT_TIMEOUT_IN_SECONDS
+          value: {{ .Values.config.dockerClientTimeoutInSeconds | quote }}
         {{- if eq .Values.config.strategy "ByDate" }}
         - name: DOCKERGC_DAYS_BEFORE_DELETION
           value: {{ .Values.config.daysBeforeDeletion | quote }}

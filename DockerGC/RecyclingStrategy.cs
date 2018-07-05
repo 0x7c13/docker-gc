@@ -10,17 +10,11 @@ namespace DockerGC
     {
         private IMatchlist _imageWhitelist;
         private IMatchlist _stateBlacklist;
-        private int _waitToleranceOfBlacklistStateContainersInDays;
 
-        public RecyclingStrategy(IMatchlist imageWhitelist, IMatchlist stateBlacklist, int waitToleranceOfBlacklistStateContainersInDays) 
+        public RecyclingStrategy(IMatchlist imageWhitelist, IMatchlist stateBlacklist) 
         {
-            if (waitToleranceOfBlacklistStateContainersInDays < 0) 
-            {
-                throw new ArgumentOutOfRangeException("waitToleranceOfBlacklistStateContainersInDays");
-            } 
-            _imageWhitelist = imageWhitelist;
-            _stateBlacklist = stateBlacklist;
-            _waitToleranceOfBlacklistStateContainersInDays = waitToleranceOfBlacklistStateContainersInDays;
+            this._imageWhitelist = imageWhitelist;
+            this._stateBlacklist = stateBlacklist;
         }
 
         public abstract IList<DockerImageNode> GetImagesToBeRecycledInOrder(IList<DockerImageNode> baseImageNodes);
@@ -28,7 +22,7 @@ namespace DockerGC
         public bool CanDelete(DockerImageNode imageNode) 
         {
             // We DO NOT delete image if it is in the whitelist
-            if (_imageWhitelist.MatchAny(imageNode.InspectResponse.RepoTags))
+            if (this._imageWhitelist.MatchAny(imageNode.InspectResponse.RepoTags))
             {
                 return false;
             }
@@ -37,13 +31,6 @@ namespace DockerGC
             if (imageNode.GetContainerCount() - imageNode.GetContainerCount(_stateBlacklist) > 0) 
             {
                 return false;
-            }
-
-            // We choose to wait for few days before removing the image when all containers are in blacklist state
-            if (imageNode.GetContainerCount(_stateBlacklist) > 0)
-            {
-                var days = (DateTime.UtcNow - imageNode.GetMostRecentFinshedAtTimestampOfAllContainers(_stateBlacklist)).Days;
-                if (days < _waitToleranceOfBlacklistStateContainersInDays) { return false; }
             }
 
             return true;
