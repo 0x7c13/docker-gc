@@ -1,7 +1,14 @@
-FROM microsoft/dotnet:2.0-sdk
-
-COPY DockerGC /docker-gc
+FROM microsoft/dotnet:2.0-sdk AS build-env
 WORKDIR /docker-gc
+
+COPY DockerGC ./
+
+RUN dotnet publish -c Release -o out
+
+# build runtime image
+FROM microsoft/dotnet:2.0-runtime 
+WORKDIR /docker-gc
+COPY --from=build-env /docker-gc/out ./
 
 ENV DOCKERGC_DOCKER_ENDPOINT unix:///var/run/docker.sock
 ENV DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES 720
@@ -29,6 +36,4 @@ ENV DOCKERGC_STATSD_LOGGER_ENABLED False
 # ENV DOCKERGC_STATSD_HOST localhost
 # ENV DOCKERGC_STATSD_PORT 8125
 
-RUN ["dotnet", "build", "-c", "Release"]
-
-ENTRYPOINT ["dotnet", "run", "-c", "Release"]
+ENTRYPOINT ["dotnet", "DockerGC.dll"]
