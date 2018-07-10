@@ -3,7 +3,10 @@ kind: DaemonSet
 metadata:
   name: {{ template "docker-gc.fullname" . }}
   labels:
+    app: {{ template "docker-gc.name" . }}
     chart: {{ template "docker-gc.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   template:
     metadata:
