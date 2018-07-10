@@ -11,7 +11,7 @@ spec:
   template:
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - name: docker-gc
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
