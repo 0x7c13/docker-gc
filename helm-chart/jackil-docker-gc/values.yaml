@@ -1,6 +1,6 @@
 # Default values for docker-gc.
 image:
-  repository: jackil/docker-gc
+  repository: airsharedcontainers.azurecr.io/docker-gc
   tag: latest
   pullPolicy: Always
 docker:
