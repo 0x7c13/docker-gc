@@ -2,7 +2,7 @@
 image:
   repository: airsharedcontainers.azurecr.io/docker-gc
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 docker:
   socketPath: /var/run/docker.sock
   volumeName: docker-volume
