@@ -9,6 +9,10 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   template:
+    metadata:
+      labels:
+        app: {{ template "docker-gc.name" . }}
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: docker-gc
