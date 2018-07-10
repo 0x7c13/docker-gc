@@ -3,7 +3,7 @@ kind: DaemonSet
 metadata:
   name: {{ template "docker-gc.fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: {{ template "docker-gc.chart" . }}
 spec:
   template:
     metadata:
