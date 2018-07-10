@@ -14,6 +14,8 @@ spec:
       - name: docker-gc
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          {{ toYaml .Values.resources | indent 10 }}
         env:
         - name: DOCKERGC_RECYCLING_STRATEGY
           value: {{ .Values.config.strategy | quote }}
@@ -46,8 +48,6 @@ spec:
         volumeMounts:
          - mountPath: {{ .Values.docker.socketPath }}
            name: {{ .Values.docker.volumeName }}
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
       volumes:
        - name: {{ .Values.docker.volumeName }}
          hostPath:
