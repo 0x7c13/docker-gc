@@ -9,9 +9,6 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   template:
-    metadata:
-      labels:
-        app: {{ template "fullname" . }}
     spec:
       containers:
       - name: {{ .Chart.Name }}
