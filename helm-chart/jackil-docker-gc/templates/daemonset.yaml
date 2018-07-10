@@ -15,7 +15,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - name: docker-gc
+      - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
