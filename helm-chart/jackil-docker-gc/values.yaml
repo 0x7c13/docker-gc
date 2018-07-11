@@ -1,6 +1,8 @@
 # Default values for docker-gc.
 image:
-  repository: airsharedcontainers.azurecr.io/docker-gc
+  repository: jackil/docker-gc
+  #Repository should be moved to AIR Shared Container Registry
+  #repository: airsharedcontainers.azurecr.io/docker-gc
   tag: latest
   pullPolicy: IfNotPresent
 docker:
