@@ -15,11 +15,11 @@ spec:
         release: {{ .Release.Name }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {{ template "docker-gc.name" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
-          {{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.resources | indent 10 }}
         env:
         - name: DOCKERGC_RECYCLING_STRATEGY
           value: {{ .Values.config.strategy | quote }}
