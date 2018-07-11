@@ -1,20 +1,25 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: {{ template "fullname" . }}
-  namespace: default
+  name: {{ template "docker-gc.fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "docker-gc.name" . }}
+    chart: {{ template "docker-gc.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "docker-gc.name" . }}
+        release: {{ .Release.Name }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {{ template "docker-gc.name" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
         env:
         - name: DOCKERGC_RECYCLING_STRATEGY
           value: {{ .Values.config.strategy | quote }}
@@ -47,8 +52,6 @@ spec:
         volumeMounts:
          - mountPath: {{ .Values.docker.socketPath }}
            name: {{ .Values.docker.volumeName }}
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
       volumes:
        - name: {{ .Values.docker.volumeName }}
          hostPath:
