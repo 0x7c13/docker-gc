@@ -13,11 +13,11 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "docker-gc.fullname" -}}
   {{- if .Values.fullnameOverride -}}
-    {{- .Values.fullnameOverride | trunc63 | trimSuffix "-" -}}
+    {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
   {{- else -}}
     {{- $name := default .Chart.Name .Values.nameOverride -}}
     {{- if contains $name .Release.Name -}}
-      {{- .Release.Name | trunc63 | trimSuffix "-" -}}
+      {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
     {{- else -}}
       {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
     {{- end -}}
@@ -29,5 +29,5 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "docker-gc.chart" -}}
-  {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc63 | trimSuffix "-" -}}
+  {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
