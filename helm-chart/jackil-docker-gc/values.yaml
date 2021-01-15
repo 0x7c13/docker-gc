@@ -11,6 +11,8 @@ image:
 docker:
   socketPath: /var/run/docker.sock
   volumeName: docker-volume
+fullnameOverride: docker-cache-cleaner
+nameOverride: docker-cache-cleaner
 statsd:
   enabled: false
   #host: localhost
@@ -31,6 +33,6 @@ resources:
     cpu: 100m
     memory: 128Mi
   requests:
-    cpu: 100m
+    cpu: "0"
     memory: 128Mi
 

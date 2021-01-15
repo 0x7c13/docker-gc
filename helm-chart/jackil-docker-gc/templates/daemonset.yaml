@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "docker-gc.fullname" . }}
@@ -8,10 +8,13 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  selector:
+    matchLabels:
+      app: docker-cache-cleaner
   template:
     metadata:
       labels:
-        app: {{ template "docker-gc.name" . }}
+        app: docker-cache-cleaner
         release: {{ .Release.Name }}
     spec:
       containers:
@@ -52,6 +55,15 @@ spec:
         volumeMounts:
          - mountPath: {{ .Values.docker.socketPath }}
            name: {{ .Values.docker.volumeName }}
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Equal 
+        value: "true"
       volumes:
        - name: {{ .Values.docker.volumeName }}
          hostPath:
@@ -62,3 +74,7 @@ spec:
         - name: {{ . }}
         {{- end }}
       {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 50%
+    type: RollingUpdate
