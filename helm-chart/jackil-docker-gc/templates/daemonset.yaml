@@ -51,7 +51,7 @@ spec:
           value: {{ .Values.statsd.host | quote }}
         - name: STATSD_PORT
           value: {{ .Values.statsd.port | quote }}                    
-        {{- end }}        
+        {{- end }}
         volumeMounts:
          - mountPath: {{ .Values.docker.socketPath }}
            name: {{ .Values.docker.volumeName }}
@@ -62,7 +62,7 @@ spec:
         operator: Exists
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
-        operator: Equal 
+        operator: Equal
         value: "true"
       volumes:
        - name: {{ .Values.docker.volumeName }}
@@ -76,5 +76,5 @@ spec:
       {{- end }}
   updateStrategy:
     rollingUpdate:
-      maxUnavailable: 50%
+      maxUnavailable: 100%
     type: RollingUpdate
