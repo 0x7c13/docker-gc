@@ -60,10 +60,6 @@ spec:
         operator: Exists
       - effect: NoExecute
         operator: Exists
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
-        operator: Equal
-        value: "true"
       volumes:
        - name: {{ .Values.docker.volumeName }}
          hostPath:
