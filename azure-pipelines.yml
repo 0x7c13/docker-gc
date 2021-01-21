@@ -35,3 +35,9 @@ steps:
     scriptPath: '$(system.defaultWorkingDirectory)/scripts/task.sh'
     args: --verbose full_drop
     workingDirectory: '$(system.defaultWorkingDirectory)'
+
+- task: PublishPipelineArtifact@0
+  displayName: 'Publish msftkube files as artifacts from $(build.artifactstagingdirectory)'
+  inputs:
+    artifactName: 'drop'
+    targetPath: '$(system.defaultWorkingDirectory)/build'
