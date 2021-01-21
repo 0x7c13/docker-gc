@@ -10,6 +10,8 @@ resources:
 
 variables:
   tag: '$(Build.BuildId)'
+  imageRepository: "viennadroptest.azurecr.io"
+
 
 stages:
 # - stage: Build
@@ -40,7 +42,7 @@ stages:
       displayName: Build and push an image to container registry
       inputs:
         command: buildAndPush
-        repository: viennadroptest.azurecr.io
+        repository: $(imageRepository)
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
