@@ -33,3 +33,27 @@ envs:
                 subscription: "{{deploy.azure.subscription}}"
                 region: "{{deploy.azure.region}}"
                 group: "{{deploy.azure.group}}"
+        docker-cache-cleaner:
+          k8s:
+            parameters:
+              fullname: docker-cache-cleaner
+              chartName: docker-cache-cleaner
+              imagePullPolicy: IfNotPresent
+              allowMissingResourceFiles: True
+              recyclingStrategy: ByDate
+              dockerEndpoint: unix:///var/run/docker.sock
+              executionIntervalInMinutes: 360
+              dockerClientTimeoutInSeconds: 180
+              imageDeletionOrder: ByImageLastTouchDate
+              strategy: ByDate
+              daysBeforeDeletion: 1
+              containerStateBlacklist: dead,exited
+              socketPath: /var/run/docker.sock
+              volumeName: docker-volume
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: "0"
+              memory: 128Mi

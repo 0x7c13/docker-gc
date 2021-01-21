@@ -6,6 +6,7 @@ image:
 docker:
   socketPath: /var/run/docker.sock
   volumeName: docker-volume
+fullname: docker-cache-cleaner
 fullnameOverride: docker-cache-cleaner
 nameOverride: docker-cache-cleaner
 statsd:

@@ -1,4 +1,9 @@
 apps:
+  __base__: # this __base__ app gets inherited by all other apps
+    __name__: ~ # this instructs spec to inject the app name as app.__name__
+    __anchor__: app
+    icm:
+      routingId: Vienna-MIR
   docker-cache-cleaner:
     deploymentGroups:
       - "default"

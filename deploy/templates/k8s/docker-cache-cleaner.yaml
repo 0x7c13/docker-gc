@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: "{{app.k8s.parameters.fullname}}"
+  labels:
+    app: "{{app.k8s.parameters.fullname}}"
+    chart: "{{app.k8s.parameters.chartName}}"
+spec:
+  selector:
+    matchLabels:
+      app: docker-cache-cleaner
+  template:
+    metadata:
+      labels:
+        app: docker-cache-cleaner
+    spec:
+      containers:
+      - name: "{{app.k8s.parameters.fullname}}"
+        image: "{{publish.docker.registry.hostname}}/{{app.drop.images.docker-cache-cleaner.name}}:{{app.drop.images.docker-cache-cleaner.tag}}"
+        imagePullPolicy: "{{app.k8s.parameters.imagePullPolicy}}"
+        resources:
+          limits:
+            cpu: "{{app.resources.limits.cpu}}"
+            memory: "{{app.resources.limits.memory}}"
+          requests:
+            cpu: "{{app.resources.requests.cpu}}"
+            memory: "{{app.resources.requests.memory}}"
+        env:
+        - name: DOCKERGC_RECYCLING_STRATEGY
+          value: "{{app.k8s.parameters.recyclingStrategy}}"
+        - name: DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES
+          value: "{{app.k8s.parameters.executionIntervalInMinutes}}"
+        - name: DOCKERGC_DOCKER_ENDPOINT
+          value: "{{app.k8s.parameters.dockerEndpoint}}"
+        - name: DOCKERGC_CONTAINER_STATE_BLACKLIST
+          value: "{{app.k8s.parameters.containerStateBlacklist}}"
+        - name: DOCKERGC_IMAGE_DELETION_ORDER
+          value: "{{app.k8s.parameters.imageDeletionOrder}}"
+        - name: DOCKERGC_DOCKER_CLIENT_TIMEOUT_IN_SECONDS
+          value: "{{app.k8s.parameters.dockerClientTimeoutInSeconds}}"
+        - name: DOCKERGC_DAYS_BEFORE_DELETION
+          value: "{{app.k8s.parameters.daysBeforeDeletion}}"
+        volumeMounts:
+         - mountPath: "{{app.k8s.parameters.socketPath}}"
+           name: "{{app.k8s.parameters.volumeName}}"
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      volumes:
+       - name: "{{app.k8s.parameters.volumeName}}"
+         hostPath:
+          path: "{{app.k8s.parameters.socketPath}}"
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+    type: RollingUpdate

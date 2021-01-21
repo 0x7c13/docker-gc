@@ -33,7 +33,7 @@ steps:
     addSpnToEnvironment: true
     scriptLocation: 'scriptPath'
     scriptPath: '$(system.defaultWorkingDirectory)/scripts/task.sh'
-    args: --verbose full_drop
+    args: --verbose full_drop -e mir-release-int-westus2
     workingDirectory: '$(system.defaultWorkingDirectory)'
 
 - task: PublishPipelineArtifact@0
