@@ -36,6 +36,7 @@ envs:
         docker-cache-cleaner:
           k8s:
             parameters:
+              namespace: docker-cache-cleaner
               fullname: docker-cache-cleaner
               chartName: docker-cache-cleaner
               imagePullPolicy: IfNotPresent

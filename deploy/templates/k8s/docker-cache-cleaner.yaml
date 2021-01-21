@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: "{{app.k8s.parameters.fullname}}"
+  namespace: "{{app.k8s.parameters.namespace}}"
   labels:
     app: "{{app.k8s.parameters.fullname}}"
     chart: "{{app.k8s.parameters.chartName}}"
