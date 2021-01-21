@@ -41,3 +41,13 @@ steps:
   inputs:
     artifactName: 'drop'
     targetPath: '$(system.defaultWorkingDirectory)/build'
+
+- task: UniversalPackages@0
+  displayName: Publish Package
+  inputs:
+    command: publish
+    publishDirectory: 'build'
+    vstsFeedPublish: 'mir-dev-feed'
+    vstsFeedPackagePublish: 'docker-cache-cleaner'
+    versionOption: 'patch'
+    packagePublishDescription: 'docker-cache-cleaner'

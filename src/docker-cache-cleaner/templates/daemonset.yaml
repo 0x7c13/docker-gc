@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: {{ template "docker-gc.name" . }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{app.drop.images.docker-cache-cleaner.tag}}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
