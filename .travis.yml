@@ -7,7 +7,7 @@ install:
 - docker build -t docker-gc-helm-chart-validate -f Dockerfile.helmtest .
 
 script:
-- docker build -t jackil/docker-gc -f Dockerfile .
+- docker build -t src/docker-cache-cleaner -f Dockerfile .
 
 after_success:
-- docker build -t jackil/docker-gc -f Dockerfile .
+- docker build -t src/docker-cache-cleaner -f Dockerfile .

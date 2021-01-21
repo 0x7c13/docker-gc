@@ -1,10 +1,12 @@
-name: jackil-docker-gc
+name: docker-cache-cleaner
 description: A Docker Image Garbage Collector Helm chart for Kubernetes
-home: https://github.com/JasonStein/docker-gc
+home: https://github.com/johndoe0920/docker-gc
 version: 1.0.0
 appVersion: latest
 sources:
-  - https://github.com/JasonStein/docker-gc
+  - https://github.com/johndoe0920/docker-gc
 maintainers:
   - name: Jiaqi Liu
     email: jackil@Microsoft.com
+  - name: Ross Wagner
+    email: rowagne@microsoft.com

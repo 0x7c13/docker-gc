@@ -1,0 +1,8 @@
+apps:
+  # msftkube will fail if there's no app
+  dummy-app:
+    deploymentGroups:
+      - "default"
+  docker-cache-cleaner:
+    deploymentGroups:
+      - "default"
