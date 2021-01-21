@@ -3,7 +3,12 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- main
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - /*
 
 pool:
   name: 'Vienna Inferencing Ubuntu'
