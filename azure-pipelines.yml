@@ -9,9 +9,11 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  # tag: '$(Build.BuildId)'
+- name: Azure.ServiceConnectionId
+  value: 'Project Vienna Build (ad203158-bc5d-4e72-b764-2607833a71dc)'
 
-stages:
+# stages:
 # - stage: Build
 #   displayName: Build image
 #   jobs:  
@@ -28,20 +30,41 @@ stages:
 #         tags: |
 #           $(tag)
 
-- stage: Build
-  displayName: Build and push stage
-  jobs:  
-  - job: Build
-    displayName: Build job
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: viennadroptest.azurecr.io
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+# - stage: Build
+#   displayName: Build and push stage
+#   jobs:  
+#   - job: Build
+#     displayName: Build job
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     steps:
+#     - task: Docker@2
+#       displayName: Build and push an image to container registry
+#       inputs:
+#         command: buildAndPush
+#         repository: viennadroptest.azurecr.io
+#         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+#         containerRegistry: $(dockerRegistryServiceConnection)
+#         tags: |
+#           $(tag)
+
+steps:
+- checkout: self
+  persistCredentials: true
+
+- task: UsePythonVersion@0
+  displayName: 'Use Python 3.8'
+  inputs:
+        versionSpec: 3.8
+
+- task: AzureCLI@1
+  displayName: 'Generate msftkube files'
+  env:
+    AZURE_DEVOPS_EXT_PAT: '$(System.AccessToken)'
+  inputs:
+    azureSubscription: '$(Azure.ServiceConnectionId)'
+    addSpnToEnvironment: true
+    scriptLocation: 'scriptPath'
+    scriptPath: '$(system.defaultWorkingDirectory)/scripts/task.sh'
+    args: --verbose full_drop
+    workingDirectory: '$(system.defaultWorkingDirectory)'

@@ -11,6 +11,17 @@ envs:
         __base__: # the __base__ app gets inherited by all other apps
           __name__: ~ # this instructs conf to inject the app name as app.__name__
           __anchor__: app
+          build:
+            __base__:
+              publish: false # infra repo opted-out from msftkube builds
+            docker:
+              __omit_base__: [ 'publish' ] # do not inherit this setting
+              builds:
+                __base__: # this __base__ docker build gets inherited by all docker builds
+                  dir: "{{app.build.dotnet.outdir}}"
+                  checksum: True  # with <Deterministic>true</Deterministic>, always checksum the dir
+                  # if a savePath is specified in docker build def then a tarball of the image will be saved into the image. It can be quite big.
+                  # savePath: "{{paths.drop}}/docker/images/{{app.__name__}}.tar.gz"
           k8s:
             source: "{{paths.k8s.source}}/{{app.__name__}}.yaml"
             destinationDirectory: "{{paths.k8s.dest}}"
