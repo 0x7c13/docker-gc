@@ -11,6 +11,7 @@ resources:
 variables:
   tag: '$(Build.BuildId)'
   imageRepository: "viennadroptest.azurecr.io"
+  dockerRegistryServiceConnection: dockerRegistryServiceConnection1
 
 
 stages:
