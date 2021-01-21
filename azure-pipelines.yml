@@ -5,25 +5,49 @@
 trigger:
 - main
 
+pool:
+  name: 'Vienna Inferencing Ubuntu'
+
 resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+- name: Azure.ServiceConnectionId
+  value: 'Project Vienna Build (ad203158-bc5d-4e72-b764-2607833a71dc)'
 
-stages:
-- stage: Build
-  displayName: Build image
-  jobs:  
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        tags: |
-          $(tag)
+steps:
+- checkout: self
+  persistCredentials: true
+
+- task: UsePythonVersion@0
+  displayName: 'Use Python 3.8'
+  inputs:
+        versionSpec: 3.8
+
+- task: AzureCLI@1
+  displayName: 'Generate msftkube files'
+  env:
+    AZURE_DEVOPS_EXT_PAT: '$(System.AccessToken)'
+  inputs:
+    azureSubscription: '$(Azure.ServiceConnectionId)'
+    addSpnToEnvironment: true
+    scriptLocation: 'scriptPath'
+    scriptPath: '$(system.defaultWorkingDirectory)/scripts/task.sh'
+    args: --verbose full_drop -e mir-release-int-westus2
+    workingDirectory: '$(system.defaultWorkingDirectory)'
+
+- task: PublishPipelineArtifact@0
+  displayName: 'Publish msftkube files as artifacts from $(build.artifactstagingdirectory)'
+  inputs:
+    artifactName: 'drop'
+    targetPath: '$(system.defaultWorkingDirectory)/build'
+
+- task: UniversalPackages@0
+  displayName: Publish Package
+  inputs:
+    command: publish
+    publishDirectory: 'build'
+    vstsFeedPublish: 'mir-dev-feed'
+    vstsFeedPackagePublish: 'docker-cache-cleaner'
+    versionOption: 'patch'
+    packagePublishDescription: 'docker-cache-cleaner'
