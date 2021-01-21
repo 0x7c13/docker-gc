@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -ex
-cd `dirname $0` > /dev/null
-cd ..
 
-python -m venv /tmp/aml-ve
-source /tmp/aml-ve/bin/activate
+PARENT_DIR=$(realpath `dirname $0`/..)
 
+python -m venv /tmp/aml-venv
+source /tmp/aml-venv/bin/activate
 wget -O - https://aka.ms/msftkube-bootstrapper.sh | bash
+
+cd $PARENT_DIR
 msftkube "$@"
