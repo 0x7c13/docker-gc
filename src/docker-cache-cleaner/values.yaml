@@ -1,7 +1,7 @@
 # Default values for docker-gc.
 image:
   repository: viennadroptest.azurecr.io/docker-cache-cleaner
-  # tag: latest
+  tag: "{{app.drop.images.docker-cache-cleaner.tag}}"
   pullPolicy: IfNotPresent
 docker:
   socketPath: /var/run/docker.sock
