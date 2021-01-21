@@ -5,6 +5,9 @@
 trigger:
 - main
 
+pool:
+  name: 'Vienna Inferencing Ubuntu'
+
 resources:
 - repo: self
 
