@@ -1,14 +1,8 @@
 # Default values for docker-gc.
 image:
-  # repository: jackil/docker-gc
-  #Repository should be moved to AIR Shared Container Registry
-  #repository: airsharedcontainers.azurecr.io/docker-gc
   repository: viennadroptest.azurecr.io/docker-cache-cleaner
-  tag: latest
+  # tag: latest
   pullPolicy: IfNotPresent
-  # optional pull secrets
-  # pullSecrets: 
-  # - "airsharedcontainers"
 docker:
   socketPath: /var/run/docker.sock
   volumeName: docker-volume
@@ -20,14 +14,11 @@ statsd:
   #port: 8125
 config:
   dockerEndpoint: unix:///var/run/docker.sock
-  executionIntervalInMinutes: 60
+  executionIntervalInMinutes: 360
   dockerClientTimeoutInSeconds: 180
   imageDeletionOrder: ByImageLastTouchDate
-  #imageDeletionOrder: ByImageCreationDate
   strategy: ByDate
-  daysBeforeDeletion: 30
-  #strategy: ByDiskSpace
-  #sizeLimitInGigabyte:
+  daysBeforeDeletion: 1
   containerStateBlacklist: dead,exited
 resources:
   limits:
