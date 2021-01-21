@@ -12,18 +12,36 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
+# - stage: Build
+#   displayName: Build image
+#   jobs:  
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     steps:
+#     - task: Docker@2
+#       displayName: Build an image
+#       inputs:
+#         command: build
+#         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+#         tags: |
+#           $(tag)
+
 - stage: Build
-  displayName: Build image
+  displayName: Build and push stage
   jobs:  
   - job: Build
-    displayName: Build
+    displayName: Build job
     pool:
       vmImage: 'ubuntu-latest'
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build and push an image to container registry
       inputs:
-        command: build
+        command: buildAndPush
+        repository: viennadroptest.azurecr.io
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
