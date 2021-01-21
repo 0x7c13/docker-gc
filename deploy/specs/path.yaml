@@ -1,0 +1,11 @@
+paths:
+  acs:
+    source: "{{paths.root}}/deploy/templates/acs"
+    dest: "{{paths.drop}}/arm"
+  k8s:
+    source: "{{paths.root}}/deploy/templates/k8s"
+    dest: "{{paths.drop}}/k8s"
+  helm:
+    source: "{{paths.root}}/deploy/templates/helm"
+    dest: "{{paths.drop}}/helm"
+  src: "{{paths.root}}/src"

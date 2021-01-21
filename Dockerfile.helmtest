@@ -18,9 +18,9 @@ RUN /bin/helm init --client-only && /bin/helm repo update
 
 WORKDIR ["/bin/helm"]
 
-COPY helm-chart/jackil-docker-gc jackil-docker-gc
+COPY src/docker-cache-cleaner docker-cache-cleaner
 
-RUN MSG=$(helm lint jackil-docker-gc | grep "no failures")
+RUN MSG=$(helm lint docker-cache-cleaner | grep "no failures")
 
 RUN echo $MSG
 

@@ -1,0 +1,24 @@
+---
+# --- ABSTRACT ALL BASE ---
+# -------------------------
+envs:
+  all-base:
+    abstract: true
+    spec:
+      __name__: ~ # spec will inject the env name as env.__name__
+#-----apps
+      apps:
+        __base__: # the __base__ app gets inherited by all other apps
+          __name__: ~ # this instructs conf to inject the app name as app.__name__
+          __anchor__: app
+          k8s:
+            source: "{{paths.k8s.source}}/{{app.__name__}}.yaml"
+            destinationDirectory: "{{paths.k8s.dest}}"
+            parameters:
+              replicaCount: 2
+          azure:
+            __base__: # base here is the type of azure resource: sql, acs, etc
+              __base__: # base is a specific named azure resource: sql-server-01, cluster-01, storage-01
+                subscription: "{{deploy.azure.subscription}}"
+                region: "{{deploy.azure.region}}"
+                group: "{{deploy.azure.group}}"

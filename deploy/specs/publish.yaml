@@ -1,0 +1,9 @@
+publish:
+  azure:
+    keyvault: 
+      name: vienna-test-westus
+  docker:
+    registry:
+      name: viennadroptest
+      resourceGroup: viennadroptest
+      subscription: ad203158-bc5d-4e72-b764-2607833a71dc
