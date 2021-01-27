@@ -1,6 +1,6 @@
 # DockerGC Unit Tests Dockerfile
 
-FROM microsoft/dotnet:2.0-sdk
+FROM mcr.microsoft.com/dotnet/sdk:5.0
 
 COPY DockerGC DockerGC
 COPY DockerGC.Tests DockerGC.Tests
