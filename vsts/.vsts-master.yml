@@ -10,6 +10,11 @@ trigger:
     include:
     - /*
 
+pr:
+  branches:
+    exclude:
+    - "*"
+
 pool:
   name: 'Vienna Inferencing Ubuntu'
 
