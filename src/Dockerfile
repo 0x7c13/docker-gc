@@ -10,6 +10,8 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0
 WORKDIR /docker-gc
 COPY --from=build-env /docker-gc/out ./
 
+RUN apt update && apt upgrade -y
+
 ENV DOCKERGC_DOCKER_ENDPOINT unix:///var/run/docker.sock
 ENV DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES 720
 ENV DOCKERGC_DOCKER_CLIENT_TIMEOUT_IN_SECONDS 180
