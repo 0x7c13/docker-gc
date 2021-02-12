@@ -22,6 +22,8 @@ config:
   strategy: ByDate
   daysBeforeDeletion: 1
   containerStateBlacklist: dead,exited
+nodeSelector:
+  beta.kubernetes.io/os: linux
 resources:
   limits:
     cpu: 100m
