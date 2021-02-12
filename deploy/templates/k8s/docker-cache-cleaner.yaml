@@ -19,8 +19,6 @@ spec:
       - name: "{{app.k8s.parameters.fullname}}"
         image: "{{publish.docker.registry.hostname}}/{{app.drop.images.docker-cache-cleaner.name}}:{{app.drop.images.docker-cache-cleaner.tag}}"
         imagePullPolicy: "{{app.k8s.parameters.imagePullPolicy}}"
-        nodeSelector:
-          beta.kubernetes.io/os: linux
         resources:
           limits:
             cpu: "{{app.resources.limits.cpu}}"
@@ -46,6 +44,8 @@ spec:
         volumeMounts:
          - mountPath: "{{app.k8s.parameters.socketPath}}"
            name: "{{app.k8s.parameters.volumeName}}"
+      nodeSelector:
+        beta.kubernetes.io/os: linux
       tolerations:
       - effect: NoSchedule
         operator: Exists
