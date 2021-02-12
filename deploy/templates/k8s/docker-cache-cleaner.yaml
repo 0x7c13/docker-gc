@@ -44,6 +44,8 @@ spec:
         volumeMounts:
          - mountPath: "{{app.k8s.parameters.socketPath}}"
            name: "{{app.k8s.parameters.volumeName}}"
+      nodeSelector:
+        beta.kubernetes.io/os: linux
       tolerations:
       - effect: NoSchedule
         operator: Exists
