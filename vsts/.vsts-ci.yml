@@ -6,7 +6,7 @@
 trigger: none
 
 pool:
-  name: 'Vienna Inferencing Ubuntu'
+  name: 'inferencing-ubuntu1804-01'
 
 resources:
 - repo: self
