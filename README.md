@@ -112,4 +112,6 @@ For custom configurations, please head to values.yaml.
 
 docker-gc.service is an example of using it with fleet.
 
+## Run and create namespace
 
+helm install --generate-name jackil-docker-gc -n <namespace> --create-namespace

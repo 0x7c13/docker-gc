@@ -1,23 +1,25 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "docker-gc.fullname" . }}
   labels:
     app: {{ template "docker-gc.name" . }}
     chart: {{ template "docker-gc.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
 spec:
+  selector:
+    matchLabels:
+      app: docker-cache-cleaner
   template:
     metadata:
       labels:
-        app: {{ template "docker-gc.name" . }}
-        release: {{ .Release.Name }}
+        app: docker-cache-cleaner
     spec:
       containers:
       - name: {{ template "docker-gc.name" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 10 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         env:
@@ -48,17 +50,20 @@ spec:
           value: {{ .Values.statsd.host | quote }}
         - name: STATSD_PORT
           value: {{ .Values.statsd.port | quote }}                    
-        {{- end }}        
+        {{- end }}
         volumeMounts:
          - mountPath: {{ .Values.docker.socketPath }}
            name: {{ .Values.docker.volumeName }}
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
       volumes:
        - name: {{ .Values.docker.volumeName }}
          hostPath:
           path: {{ .Values.docker.socketPath }}
-      {{- if .Values.image.pullSecrets }}
-      imagePullSecrets:
-        {{- range .Values.image.pullSecrets }}
-        - name: {{ . }}
-        {{- end }}
-      {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+    type: RollingUpdate

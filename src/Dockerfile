@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.0-sdk AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /docker-gc
 
 COPY DockerGC ./
@@ -6,9 +6,11 @@ COPY DockerGC ./
 RUN dotnet publish -c Release -o out
 
 # build runtime image
-FROM microsoft/dotnet:2.0-runtime 
+FROM mcr.microsoft.com/dotnet/runtime:5.0 
 WORKDIR /docker-gc
 COPY --from=build-env /docker-gc/out ./
+
+RUN apt update && apt upgrade -y && apt autoclean
 
 ENV DOCKERGC_DOCKER_ENDPOINT unix:///var/run/docker.sock
 ENV DOCKERGC_EXECUTION_INTERVAL_IN_MINUTES 720
