@@ -11,3 +11,5 @@ script:
 
 after_success:
 - docker build -t jackil/docker-gc -f Dockerfile .
+
+# Added comment - 
